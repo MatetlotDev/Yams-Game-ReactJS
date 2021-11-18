@@ -31,58 +31,10 @@ const buttonStyle = {
 
 let tab = ['-', '-', '-', '-', '-'];
 
-const p = [
-  {
-    as: null,
-    two: null,
-    three: null,
-    four: null,
-    five: null,
-    six: null,
-    total: null,
-    bonus: null,
-    total1: null,
-    max: null,
-    min: null,
-    total2: null,
-    brelan: null,
-    smSuite: null,
-    bgSuite: null,
-    full: null,
-    square: null,
-    yams: null,
-    chance: null,
-    total3: null,
-    total4: null,
-  },
-  {
-    as: null,
-    two: null,
-    three: null,
-    four: null,
-    five: null,
-    six: null,
-    total: null,
-    bonus: null,
-    total1: null,
-    max: null,
-    min: null,
-    total2: null,
-    brelan: null,
-    smSuite: null,
-    bgSuite: null,
-    full: null,
-    square: null,
-    yams: null,
-    chance: null,
-    total3: null,
-    total4: null,
-  }
-]
 
 function App() {
 
-  const [grid, setGrid] = useState(p);
+  const [grid, setGrid] = useState([]);
   const [scoreList, setScoreList] = useState([]);
   const [compteur, setCompteur] = useState(0);
   const [nbrTour, setNbrTour] = useState(0);
@@ -173,7 +125,7 @@ function App() {
   const writeScore = async (player, row) => {
     let newGrid = [...grid];
 
-    //--- condition pour chaque case ---
+    //--- condition pour chaque case --- //
 
     switch (row) {
 
@@ -239,25 +191,25 @@ function App() {
             return
           } countB[el] = 1;
         })
-        for(let i = 0; i <= 5; i++) if (countB[i] >= 3) brelan = true
-        
-          if (brelan) {
-            if (currentP === 1 && player === 1 && newGrid[0].brelan === null) newGrid[0].brelan = total;
-            else if (currentP === 2 && player === 2 && newGrid[1].brelan === null) newGrid[1].brelan = total;
-          } else {
-            if (currentP === 1 && player === 1 && newGrid[0].brelan === null) newGrid[0].brelan = 0;
-            else if (currentP === 2 && player === 2 && newGrid[1].brelan === null) newGrid[1].brelan = 0;
-          }             
+        for (let i = 0; i <= 5; i++) if (countB[i] >= 3) brelan = true
+
+        if (brelan) {
+          if (currentP === 1 && player === 1 && newGrid[0].brelan === null) newGrid[0].brelan = total;
+          else if (currentP === 2 && player === 2 && newGrid[1].brelan === null) newGrid[1].brelan = total;
+        } else {
+          if (currentP === 1 && player === 1 && newGrid[0].brelan === null) newGrid[0].brelan = 0;
+          else if (currentP === 2 && player === 2 && newGrid[1].brelan === null) newGrid[1].brelan = 0;
+        }
         break;
 
       case 'smsuite':
         const sortedsm = scoreList.sort().filter((item, pos) => scoreList.indexOf(item) == pos);
         let suitesm = 0;
-        if(sortedsm[0] === 0 && sortedsm[1] !== 1){
+        if (sortedsm[0] === 0 && sortedsm[1] !== 1) {
           for (let i = sortedsm.length - 1; i >= 2; i--) {
             if (sortedsm[i] === sortedsm[i - 1] + 1) suitesm++;
           }
-        }else {
+        } else {
           for (let i = 0; i < 3; i++) {
             if (sortedsm[i] + 1 === sortedsm[i + 1]) suitesm++;
           }
@@ -324,6 +276,7 @@ function App() {
           if (currentP === 1 && player === 1 && newGrid[0].yams === null) newGrid[0].yams = 0;
           else if (currentP === 2 && player === 2 && newGrid[1].yams === null) newGrid[1].yams = 0;
         }
+        break;
 
       case 'chance':
         if (currentP === 1 && player === 1 && newGrid[0].chance === null) newGrid[0].chance = total;
@@ -390,139 +343,142 @@ function App() {
   }
 
 
+  if (grid.length === 0) {
+    return ''
+  } else {
+    return (
+      <div style={styleContainer}>
+        <div>
+          <div onClick={() => startGame()} style={buttonStyle}>Lancer les dés</div>
+          <p>Total : {totalExist}</p>
+          <p>Current player : {currentP}</p>
+          <p>Nombre de lancé : {compteur}</p>
+          <table>
+            <tbody>
+              <tr>
+                <td>JOUEURS</td>
+                <td>P1</td>
+                <td>P2</td>
+              </tr>
+              <tr>
+                <td>AS</td>
+                <td onClick={() => writeScore(1, 'as')}>{grid[0].as}</td>
+                <td onClick={() => writeScore(2, 'as')}>{grid[1].as}</td>
+              </tr>
+              <tr>
+                <td>TWO</td>
+                <td onClick={() => writeScore(1, 'two')}>{grid[0].two}</td>
+                <td onClick={() => writeScore(2, 'two')}>{grid[1].two}</td>
+              </tr>
+              <tr>
+                <td>THREE</td>
+                <td onClick={() => writeScore(1, 'three')}>{grid[0].three}</td>
+                <td onClick={() => writeScore(2, 'three')}>{grid[1].three}</td>
+              </tr>
+              <tr>
+                <td>FOUR</td>
+                <td onClick={() => writeScore(1, 'four')}>{grid[0].four}</td>
+                <td onClick={() => writeScore(2, 'four')}>{grid[1].four}</td>
+              </tr>
+              <tr>
+                <td>FIVE</td>
+                <td onClick={() => writeScore(1, 'five')}>{grid[0].five}</td>
+                <td onClick={() => writeScore(2, 'five')}>{grid[1].five}</td>
+              </tr>
+              <tr>
+                <td>SIX</td>
+                <td onClick={() => writeScore(1, 'six')}>{grid[0].six}</td>
+                <td onClick={() => writeScore(2, 'six')}>{grid[1].six}</td>
+              </tr>
+              <tr>
+                <td>TOTAL</td>
+                <td>{grid[0].total}</td>
+                <td>{grid[1].total}</td>
+              </tr>
+              <tr>
+                <td>BONUS</td>
+                <td>{grid[0].bonus}</td>
+                <td>{grid[1].bonus}</td>
+              </tr>
+              <tr>
+                <td>TOTAL1</td>
+                <td>{grid[0].total1}</td>
+                <td>{grid[1].total1}</td>
+              </tr>
+              <tr>
+                <td>MAX</td>
+                <td onClick={() => writeScore(1, 'max')}>{grid[0].max}</td>
+                <td onClick={() => writeScore(2, 'max')}>{grid[1].max}</td>
+              </tr>
+              <tr>
+                <td>MIN</td>
+                <td onClick={() => writeScore(1, 'min')}>{grid[0].min}</td>
+                <td onClick={() => writeScore(2, 'min')}>{grid[1].min}</td>
+              </tr>
+              <tr>
+                <td>TOTAL2</td>
+                <td>{grid[0].total2}</td>
+                <td>{grid[1].total2}</td>
+              </tr>
+              <tr>
+                <td>BRELAN</td>
+                <td onClick={() => writeScore(1, 'brelan')}>{grid[0].brelan}</td>
+                <td onClick={() => writeScore(2, 'brelan')}>{grid[1].brelan}</td>
+              </tr>
+              <tr>
+                <td>Pt. SUITE</td>
+                <td onClick={() => writeScore(1, 'smsuite')}>{grid[0].smSuite}</td>
+                <td onClick={() => writeScore(2, 'smsuite')}>{grid[1].smSuite}</td>
+              </tr>
+              <tr>
+                <td>Grd. SUITE</td>
+                <td onClick={() => writeScore(1, 'bgsuite')}>{grid[0].bgSuite}</td>
+                <td onClick={() => writeScore(2, 'bgsuite')}>{grid[1].bgSuite}</td>
+              </tr>
+              <tr>
+                <td>FULL</td>
+                <td onClick={() => writeScore(1, 'full')}>{grid[0].full}</td>
+                <td onClick={() => writeScore(2, 'full')}>{grid[1].full}</td>
+              </tr>
+              <tr>
+                <td>CARRE</td>
+                <td onClick={() => writeScore(1, 'square')}>{grid[0].square}</td>
+                <td onClick={() => writeScore(2, 'square')}>{grid[1].square}</td>
+              </tr>
+              <tr>
+                <td>YAMS</td>
+                <td onClick={() => writeScore(1, 'yams')}>{grid[0].yams}</td>
+                <td onClick={() => writeScore(2, 'yams')}>{grid[1].yams}</td>
+              </tr>
+              <tr>
+                <td>CHANCE</td>
+                <td onClick={() => writeScore(1, 'chance')}>{grid[0].chance}</td>
+                <td onClick={() => writeScore(2, 'chance')}>{grid[1].chance}</td>
+              </tr>
+              <tr>
+                <td>TOTAL3</td>
+                <td>{grid[0].total3}</td>
+                <td>{grid[1].total3}</td>
+              </tr>
+              <tr>
+                <td>TOTAL4</td>
+                <td>{grid[0].total4}</td>
+                <td>{grid[1].total4}</td>
+              </tr>
+            </tbody>
+          </table>
+          <button onClick={() => startOver()}>Recommencer</button>
+        </div>
 
-  return (
-    <div style={styleContainer}>
-      <div>
-        <div onClick={() => startGame()} style={buttonStyle}>Lancer les dés</div>
-        <p>Total : {totalExist}</p>
-        <p>Current player : {currentP}</p>
-        <p>Nombre de lancé : {compteur}</p>
-        <table>
-          <tbody>
-            <tr>
-              <td>JOUEURS</td>
-              <td>P1</td>
-              <td>P2</td>
-            </tr>
-            <tr>
-              <td>AS</td>
-              <td onClick={() => writeScore(1, 'as')}>{grid[0].as}</td>
-              <td onClick={() => writeScore(2, 'as')}>{grid[1].as}</td>
-            </tr>
-            <tr>
-              <td>TWO</td>
-              <td onClick={() => writeScore(1, 'two')}>{grid[0].two}</td>
-              <td onClick={() => writeScore(2, 'two')}>{grid[1].two}</td>
-            </tr>
-            <tr>
-              <td>THREE</td>
-              <td onClick={() => writeScore(1, 'three')}>{grid[0].three}</td>
-              <td onClick={() => writeScore(2, 'three')}>{grid[1].three}</td>
-            </tr>
-            <tr>
-              <td>FOUR</td>
-              <td onClick={() => writeScore(1, 'four')}>{grid[0].four}</td>
-              <td onClick={() => writeScore(2, 'four')}>{grid[1].four}</td>
-            </tr>
-            <tr>
-              <td>FIVE</td>
-              <td onClick={() => writeScore(1, 'five')}>{grid[0].five}</td>
-              <td onClick={() => writeScore(2, 'five')}>{grid[1].five}</td>
-            </tr>
-            <tr>
-              <td>SIX</td>
-              <td onClick={() => writeScore(1, 'six')}>{grid[0].six}</td>
-              <td onClick={() => writeScore(2, 'six')}>{grid[1].six}</td>
-            </tr>
-            <tr>
-              <td>TOTAL</td>
-              <td>{grid[0].total}</td>
-              <td>{grid[1].total}</td>
-            </tr>
-            <tr>
-              <td>BONUS</td>
-              <td>{grid[0].bonus}</td>
-              <td>{grid[1].bonus}</td>
-            </tr>
-            <tr>
-              <td>TOTAL1</td>
-              <td>{grid[0].total1}</td>
-              <td>{grid[1].total1}</td>
-            </tr>
-            <tr>
-              <td>MAX</td>
-              <td onClick={() => writeScore(1, 'max')}>{grid[0].max}</td>
-              <td onClick={() => writeScore(2, 'max')}>{grid[1].max}</td>
-            </tr>
-            <tr>
-              <td>MIN</td>
-              <td onClick={() => writeScore(1, 'min')}>{grid[0].min}</td>
-              <td onClick={() => writeScore(2, 'min')}>{grid[1].min}</td>
-            </tr>
-            <tr>
-              <td>TOTAL2</td>
-              <td>{grid[0].total2}</td>
-              <td>{grid[1].total2}</td>
-            </tr>
-            <tr>
-              <td>BRELAN</td>
-              <td onClick={() => writeScore(1, 'brelan')}>{grid[0].brelan}</td>
-              <td onClick={() => writeScore(2, 'brelan')}>{grid[1].brelan}</td>
-            </tr>
-            <tr>
-              <td>Pt. SUITE</td>
-              <td onClick={() => writeScore(1, 'smsuite')}>{grid[0].smSuite}</td>
-              <td onClick={() => writeScore(2, 'smsuite')}>{grid[1].smSuite}</td>
-            </tr>
-            <tr>
-              <td>Grd. SUITE</td>
-              <td onClick={() => writeScore(1, 'bgsuite')}>{grid[0].bgSuite}</td>
-              <td onClick={() => writeScore(2, 'bgsuite')}>{grid[1].bgSuite}</td>
-            </tr>
-            <tr>
-              <td>FULL</td>
-              <td onClick={() => writeScore(1, 'full')}>{grid[0].full}</td>
-              <td onClick={() => writeScore(2, 'full')}>{grid[1].full}</td>
-            </tr>
-            <tr>
-              <td>CARRE</td>
-              <td onClick={() => writeScore(1, 'square')}>{grid[0].square}</td>
-              <td onClick={() => writeScore(2, 'square')}>{grid[1].square}</td>
-            </tr>
-            <tr>
-              <td>YAMS</td>
-              <td onClick={() => writeScore(1, 'yams')}>{grid[0].yams}</td>
-              <td onClick={() => writeScore(2, 'yams')}>{grid[1].yams}</td>
-            </tr>
-            <tr>
-              <td>CHANCE</td>
-              <td onClick={() => writeScore(1, 'chance')}>{grid[0].chance}</td>
-              <td onClick={() => writeScore(2, 'chance')}>{grid[1].chance}</td>
-            </tr>
-            <tr>
-              <td>TOTAL3</td>
-              <td>{grid[0].total3}</td>
-              <td>{grid[1].total3}</td>
-            </tr>
-            <tr>
-              <td>TOTAL4</td>
-              <td>{grid[0].total4}</td>
-              <td>{grid[1].total4}</td>
-            </tr>
-          </tbody>
-        </table>
-        <button onClick={() => startOver()}>Recommencer</button>
+        <div>{winner}</div>
+
+        <div>
+          {diceList}
+        </div>
+
       </div>
-
-      <div>{winner}</div>
-
-      <div>
-        {diceList}
-      </div>
-
-    </div>
-  );
+    );
+  }
 }
 
 

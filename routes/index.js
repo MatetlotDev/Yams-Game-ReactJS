@@ -4,60 +4,35 @@ const playerModel = require('../model/grid');
 
 /* GET home page. */
 router.get('/create-grid', async function (req, res, next) {
-  const player1 = new playerModel({
-    player: 1,
-    grid: {
-      as: null,
-      two: null,
-      three: null,
-      four: null,
-      five: null,
-      six: null,
-      total: null,
-      bonus: null,
-      total1: null,
-      max: null,
-      min: null,
-      total2: null,
-      brelan: null,
-      smSuite: null,
-      bgSuite: null,
-      full: null,
-      square: null,
-      yams: null,
-      chance: null,
-      total3: null,
-      total4: null,
-    }
-  })
-  await player1.save();
-  const player2 = new playerModel({
-    player: 2,
-    grid: {
-      as: null,
-      two: null,
-      three: null,
-      four: null,
-      five: null,
-      six: null,
-      total: null,
-      bonus: null,
-      total1: null,
-      max: null,
-      min: null,
-      total2: null,
-      brelan: null,
-      smSuite: null,
-      bgSuite: null,
-      full: null,
-      square: null,
-      yams: null,
-      chance: null,
-      total3: null,
-      total4: null,
-    }
-  })
-  await player2.save();
+  for(let i = 1; i < 3; i++){
+    const player = new playerModel({
+      player: i,
+      grid: {
+        as: null,
+        two: null,
+        three: null,
+        four: null,
+        five: null,
+        six: null,
+        total: null,
+        bonus: null,
+        total1: null,
+        max: null,
+        min: null,
+        total2: null,
+        brelan: null,
+        smSuite: null,
+        bgSuite: null,
+        full: null,
+        square: null,
+        yams: null,
+        chance: null,
+        total3: null,
+        total4: null,
+      }
+    })
+    await player.save();
+  }
 
   const players = await playerModel.find();
   res.json(players);
