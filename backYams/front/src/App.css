@@ -1,0 +1,15 @@
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+td, table{
+  border: 1px solid grey;
+}
+td{
+  min-width: 16px;
+}
+table{
+  width: 200px;
+  border-collapse: collapse;      
+}
