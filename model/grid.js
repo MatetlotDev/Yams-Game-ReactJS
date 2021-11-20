@@ -26,6 +26,7 @@ const gridSchema = mongoose.Schema({
 
 const playerSchema = mongoose.Schema({
     player: Number,
+    name: String,
     grid: gridSchema,
 })
 

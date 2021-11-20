@@ -2,11 +2,16 @@ var express = require('express');
 var router = express.Router();
 const playerModel = require('../model/grid');
 
-/* GET home page. */
-router.get('/create-grid', async function (req, res, next) {
+
+router.post('/create-game', async (req, res) => {
+  await playerModel.deleteMany();
+  const names = JSON.parse(req.body.names);
+
   for(let i = 1; i < 3; i++){
+    
     const player = new playerModel({
       player: i,
+      name: names[i - 1],
       grid: {
         as: null,
         two: null,
@@ -33,10 +38,10 @@ router.get('/create-grid', async function (req, res, next) {
     })
     await player.save();
   }
-
   const players = await playerModel.find();
-  res.json(players);
-});
+  players ? res.json({message: true}) : res.json({message: false})
+})
+
 
 router.get('/get-grid', async (req, res) => {
   const grids = await playerModel.find();
@@ -52,8 +57,5 @@ router.put('/update-grid', async (req, res) => {
   res.json(players);
 })
 
-router.delete('/delete-grid', async (req, res) => {
-  await playerModel.deleteMany();
-})
 
 module.exports = router;
