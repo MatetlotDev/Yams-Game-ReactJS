@@ -38,22 +38,20 @@ export default function Game() {
     const [grid, setGrid] = useState([]);
     const [scoreList, setScoreList] = useState([]);
     const [compteur, setCompteur] = useState(0);
-    const [nbrTour, setNbrTour] = useState(0);
     const [currentP, setCurrentP] = useState(1);
     const [winner, setWinner] = useState('');
-    const [player1Name, setPlayer1Name] = useState('');
-    const [player2Name, setPlayer2Name] = useState('');
+    const [names, setNames] = useState([]);
 
 
     useEffect(() => {
         const loadGrid = async () => {
             const request = await fetch('/get-grid')
             const result = await request.json();
-            const grids = [result[0].grid, result[1].grid]
+            const grids = result.map(el => el.grid)
             setGrid(grids)
-            setPlayer1Name(result[0].name);
-            setPlayer2Name(result[1].name);
-        }        
+            const name = result.map(el => el.name);
+            setNames(name);
+        }
         loadGrid();
     }, [])
 
@@ -88,29 +86,6 @@ export default function Game() {
     }
 
 
-
-    const startOver = () => {
-        async function deleteGrid() {
-            await fetch('/delete-grid', {
-                method: 'DELETE',
-            })
-        }
-        async function createGrid() {
-            const requete = await fetch('/create-grid');
-            const result = await requete.json();
-            setGrid([result[0].grid, result[1].grid]);
-        }
-        deleteGrid();
-        createGrid();
-        setCompteur(0);
-        setCurrentP(1);
-        setScoreList([]);
-        setWinner('');
-        tab = ['-', '-', '-', '-', '-'];
-    }
-
-
-
     let totalExist = '';
     let total = scoreList.reduce((a, b) => a + b, 5);
     if (total > 5) totalExist = total;
@@ -118,232 +93,270 @@ export default function Game() {
 
 
     const nextPlayer = () => {
+        console.log('next')
         tab = ['-', '-', '-', '-', '-'];
         setScoreList([])
         setCompteur(0);
-        currentP === 1 ? setCurrentP(2) : setCurrentP(1);
-        setNbrTour(nbrTour + 1);
+        currentP === names.length ? setCurrentP(1) : setCurrentP(currentP + 1)
     }
 
 
 
     const writeScore = async (player, row) => {
-        let newGrid = [...grid];
+        if (scoreList.length !== 0) {
 
-        //--- condition pour chaque case --- //
+            let newGrid = [...grid];
 
-        switch (row) {
+            //--- condition pour chaque case --- //
 
-            case 'as':
-                const arr0 = scoreList.map(e => e === 0 ? 1 : 0)
-                const sum0 = arr0.reduce((a, b) => a + b);
-                if (currentP === 1 && player === 1 && newGrid[0].as === null) newGrid[0].as = sum0;
-                else if (currentP === 2 && player === 2 && newGrid[1].as === null) newGrid[1].as = sum0;
-                break;
+            switch (row) {
 
-            case 'two':
-                const arr1 = scoreList.map(e => e === 1 ? 2 : 0)
-                const sum1 = arr1.reduce((a, b) => a + b);
-                if (currentP === 1 && player === 1 && newGrid[0].two === null) newGrid[0].two = sum1;
-                else if (currentP === 2 && player === 2 && newGrid[1].two === null) newGrid[1].two = sum1;
+                case 'as':
+                    const arr0 = scoreList.map(e => e === 0 ? 1 : 0)
+                    const sum0 = arr0.reduce((a, b) => a + b);
+                    names.forEach((el, i) => {
+                        if (currentP === i + 1 && player === i && newGrid[i].as === null) newGrid[i].as = sum0;
+                    })
+                    break;
 
-                break;
+                case 'two':
+                    const arr1 = scoreList.map(e => e === 1 ? 2 : 0)
+                    const sum1 = arr1.reduce((a, b) => a + b);
+                    names.forEach((el, i) => {
+                        if (currentP === i + 1 && player === i && newGrid[i].two === null) newGrid[i].two = sum1;
+                    })
+                    break;
 
-            case 'three':
-                const arr2 = scoreList.map(e => e === 2 ? 3 : 0)
-                const sum2 = arr2.reduce((a, b) => a + b);
-                if (currentP === 1 && player === 1 && newGrid[0].three === null) newGrid[0].three = sum2;
-                else if (currentP === 2 && player === 2 && newGrid[1].three === null) newGrid[1].three = sum2;
-                break;
+                case 'three':
+                    const arr2 = scoreList.map(e => e === 2 ? 3 : 0)
+                    const sum2 = arr2.reduce((a, b) => a + b);
+                    names.forEach((el, i) => {
+                        if (currentP === i + 1 && player === i && newGrid[i].three === null) newGrid[i].three = sum2;
+                    })
+                    break;
 
-            case 'four':
-                const arr3 = scoreList.map(e => e === 3 ? 4 : 0)
-                const sum3 = arr3.reduce((a, b) => a + b);
-                if (currentP === 1 && player === 1 && newGrid[0].four === null) newGrid[0].four = sum3;
-                else if (currentP === 2 && player === 2 && newGrid[1].four === null) newGrid[1].four = sum3;
-                break;
+                case 'four':
+                    const arr3 = scoreList.map(e => e === 3 ? 4 : 0)
+                    const sum3 = arr3.reduce((a, b) => a + b);
+                    names.forEach((el, i) => {
+                        if (currentP === i + 1 && player === i && newGrid[i].four === null) newGrid[i].four = sum3;
+                    })
+                    break;
 
-            case 'five':
-                const arr4 = scoreList.map(e => e === 4 ? 5 : 0)
-                const sum4 = arr4.reduce((a, b) => a + b);
-                if (currentP === 1 && player === 1 && newGrid[0].five === null) newGrid[0].five = sum4;
-                else if (currentP === 2 && player === 2 && newGrid[1].five === null) newGrid[1].five = sum4;
-                break;
+                case 'five':
+                    const arr4 = scoreList.map(e => e === 4 ? 5 : 0)
+                    const sum4 = arr4.reduce((a, b) => a + b);
+                    names.forEach((el, i) => {
+                        if (currentP === i + 1 && player === i && newGrid[i].five === null) newGrid[i].five = sum4;
+                    })
+                    break;
 
-            case 'six':
-                const arr5 = scoreList.map(e => e === 5 ? 6 : 0)
-                const sum5 = arr5.reduce((a, b) => a + b);
-                if (currentP === 1 && player === 1 && newGrid[0].six === null) newGrid[0].six = sum5;
-                else if (currentP === 2 && player === 2 && newGrid[1].six === null) newGrid[1].six = sum5;
-                break;
+                case 'six':
+                    const arr5 = scoreList.map(e => e === 5 ? 6 : 0)
+                    const sum5 = arr5.reduce((a, b) => a + b);
+                    names.forEach((el, i) => {
+                        if (currentP === i + 1 && player === i && newGrid[i].six === null) newGrid[i].six = sum5;
+                    })
+                    break;
 
-            case 'max':
-                if (currentP === 1 && player === 1 && newGrid[0].max === null) newGrid[0].max = total;
-                else if (currentP === 2 && player === 2 && newGrid[1].max === null) newGrid[1].max = total;
-                break;
+                case 'max':
+                    names.forEach((el, i) => {
+                        if (currentP === i + 1 && player === i && newGrid[i].max === null) newGrid[i].max = total;
+                    })
+                    break;
 
-            case 'min':
-                if (currentP === 1 && player === 1 && newGrid[0].min === null) newGrid[0].min = total;
-                else if (currentP === 2 && player === 2 && newGrid[1].min === null) newGrid[1].min = total;
-                break;
+                case 'min':
+                    names.forEach((el, i) => {
+                        if (currentP === i + 1 && player === i && newGrid[i].min === null) newGrid[i].min = total;
+                    })
+                    break;
 
-            case 'brelan':
-                const countB = {};
-                let brelan = false;
-                scoreList.forEach(el => {
-                    if (countB[el]) {
-                        countB[el] += 1;
-                        return
-                    } countB[el] = 1;
-                })
-                for (let i = 0; i <= 5; i++) if (countB[i] >= 3) brelan = true
+                case 'brelan':
+                    const countB = {};
+                    let brelan = false;
+                    scoreList.forEach(el => {
+                        if (countB[el]) {
+                            countB[el] += 1;
+                            return
+                        } countB[el] = 1;
+                    })
+                    for (let i = 0; i <= 5; i++) if (countB[i] >= 3) brelan = true
 
-                if (brelan) {
-                    if (currentP === 1 && player === 1 && newGrid[0].brelan === null) newGrid[0].brelan = total;
-                    else if (currentP === 2 && player === 2 && newGrid[1].brelan === null) newGrid[1].brelan = total;
-                } else {
-                    if (currentP === 1 && player === 1 && newGrid[0].brelan === null) newGrid[0].brelan = 0;
-                    else if (currentP === 2 && player === 2 && newGrid[1].brelan === null) newGrid[1].brelan = 0;
-                }
-                break;
-
-            case 'smsuite':
-                const sortedsm = scoreList.sort().filter((item, pos) => scoreList.indexOf(item) == pos);
-                let suitesm = 0;
-                if (sortedsm[0] === 0 && sortedsm[1] !== 1) {
-                    for (let i = sortedsm.length - 1; i >= 2; i--) {
-                        if (sortedsm[i] === sortedsm[i - 1] + 1) suitesm++;
+                    if (brelan) {
+                        names.forEach((el, i) => {
+                            if (currentP === i + 1 && player === i && newGrid[i].brelan === null) newGrid[i].brelan = total;
+                        })
+                    } else {
+                        names.forEach((el, i) => {
+                            if (currentP === i + 1 && player === i && newGrid[i].brelan === null) newGrid[i].brelan = 0;
+                        })
                     }
-                } else {
-                    for (let i = 0; i < 3; i++) {
-                        if (sortedsm[i] + 1 === sortedsm[i + 1]) suitesm++;
+                    break;
+
+                case 'smsuite':
+                    const sortedsm = scoreList.sort().filter((item, pos) => scoreList.indexOf(item) == pos);
+                    let suitesm = 0;
+                    if (sortedsm[0] === 0 && sortedsm[1] !== 1) {
+                        for (let i = sortedsm.length - 1; i >= 2; i--) {
+                            if (sortedsm[i] === sortedsm[i - 1] + 1) suitesm++;
+                        }
+                    } else {
+                        for (let i = 0; i < 3; i++) {
+                            if (sortedsm[i] + 1 === sortedsm[i + 1]) suitesm++;
+                        }
+                    }
+                    if (suitesm === 3) {
+                        names.forEach((el, i) => {
+                            if (currentP === i + 1 && player === i && newGrid[i].smSuite === null) newGrid[i].smSuite = 30;
+                        })
+                    } else {
+                        names.forEach((el, i) => {
+                            if (currentP === i + 1 && player === i && newGrid[i].smSuite === null) newGrid[i].smSuite = 0;
+                        })
+                    }
+                    break;
+
+                case 'bgsuite':
+                    const sorted = scoreList.sort();
+                    let suite = false;
+                    for (let i = 0; i < sorted.length - 1; i++) {
+                        suite = false;
+                        if (sorted[i] + 1 == sorted[i + 1]) suite = true;
+                    }
+                    if (suite) {
+                        names.forEach((el, i) => {
+                            if (currentP === i + 1 && player === i && newGrid[i].bgSuite === null) newGrid[i].bgSuite = 40;
+                        })
+                    } else {
+                        names.forEach((el, i) => {
+                            if (currentP === i + 1 && player === i && newGrid[i].bgSuite === null) newGrid[i].bgSuite = 0;
+                        })
+                    }
+                    break;
+
+                case 'full':
+                    const full = scoreList.filter((item, pos) => scoreList.indexOf(item) == pos)
+                    if (full.length === 2) {
+                        names.forEach((el, i) => {
+                            if (currentP === i + 1 && player === i && newGrid[i].full === null) newGrid[i].full = 25;
+                        })
+                    } else {
+                        names.forEach((el, i) => {
+                            if (currentP === i + 1 && player === i && newGrid[i].full === null) newGrid[i].full = 0;
+                        })
+                    }
+                    break;
+
+                case 'square':
+                    const count = {};
+                    scoreList.forEach(el => {
+                        if (count[el]) {
+                            count[el] += 1;
+                            return
+                        } count[el] = 1;
+                    })
+                    if (count[0] === 4 || count[1] === 4 || count[2] === 4 || count[3] === 4 || count[4] === 4 || count[5] === 4) {
+                        names.forEach((el, i) => {
+                            if (currentP === i + 1 && player === i && newGrid[i].square === null) newGrid[i].square = total;
+                        })
+                    } else {
+                        names.forEach((el, i) => {
+                            if (currentP === i + 1 && player === i && newGrid[i].square === null) newGrid[i].square = 0;
+                        })
+                    }
+                    break;
+
+                case 'yams':
+                    const same = scoreList.every(el => el === scoreList[0])
+                    if (same) {
+                        names.forEach((el, i) => {
+                            if (currentP === i + 1 && player === i && newGrid[i].yams === null) newGrid[i].yams = 50;
+                        })
+                    } else {
+                        names.forEach((el, i) => {
+                            if (currentP === i + 1 && player === i && newGrid[i].yams === null) newGrid[i].yams = 0;
+                        })
+                    }
+                    break;
+
+                case 'chance':
+                    names.forEach((el, i) => {
+                        if (currentP === i + 1 && player === i && newGrid[i].chance === null) newGrid[i].chance = total;
+                    })
+                    break;
+            }
+
+
+
+            // --- total 0 --- //
+            names.forEach((el, i) => {
+                if (newGrid[i].as !== null && newGrid[i].two !== null && newGrid[i].three !== null && newGrid[i].four !== null && newGrid[i].five !== null && newGrid[i].six !== null) {
+                    newGrid[i].total = newGrid[i].as + newGrid[i].two + newGrid[i].three + newGrid[i].four + newGrid[i].five + newGrid[i].six;
+                }
+            })
+
+            //--- prime --- //
+            names.forEach((el, i) => {
+                if (newGrid[i].total !== null) newGrid[i].total > 63 ? newGrid[i].bonus = 35 : newGrid[i].bonus = 0;
+            })
+
+            // --- total 1 --- //
+            names.forEach((el, i) => {
+                if (newGrid[i].bonus !== null) newGrid[i].total1 = newGrid[i].bonus + newGrid[i].total;
+            })
+
+            // ---total 2 --- //
+            names.forEach((el, i) => {
+                if (newGrid[i].max !== null && newGrid[i].min !== null) newGrid[i].total2 = newGrid[i].max - newGrid[i].min;
+            })
+
+            // --- total 3 --- //
+            names.forEach((el, i) => {
+                if (newGrid[i].brelan !== null && newGrid[i].smSuite !== null && newGrid[i].bgSuite !== null && newGrid[i].full !== null && newGrid[i].square !== null && newGrid[i].yams !== null) {
+                    newGrid[i].total3 = newGrid[i].brelan + newGrid[i].smSuite + newGrid[i].bgSuite + newGrid[i].full + newGrid[i].square + newGrid[i].yams;
+                }
+            })
+
+            //--- total 4 ---//
+            names.forEach((el, i) => {
+                if (newGrid[i].total !== null && newGrid[i].total1 !== null && newGrid[i].total2 !== null && newGrid[i].total3 !== null) {
+                    newGrid[i].total4 = newGrid[i].total + newGrid[i].total1 + newGrid[i].total2 + newGrid[i].total3
+                }
+            })
+
+
+            if (newGrid[names.length - 1].total4) {
+                const endingScores = newGrid.map(el => el.total4);
+                let winner = 0;
+                let max = endingScores[0];
+                for (let i = 1; i < endingScores.length; ++i) {
+                    if (endingScores[i] > max) {
+                        max = endingScores[i];
+                        winner = i;
                     }
                 }
-                if (suitesm === 3) {
-                    if (currentP === 1 && player === 1 && newGrid[0].smSuite === null) newGrid[0].smSuite = 30;
-                    else if (currentP === 2 && player === 2 && newGrid[1].smSuite === null) newGrid[1].smSuite = 30;
-                } else {
-                    if (currentP === 1 && player === 1 && newGrid[0].smSuite === null) newGrid[0].smSuite = 0;
-                    else if (currentP === 2 && player === 2 && newGrid[1].smSuite === null) newGrid[1].smSuite = 0;
-                }
-                break;
+                setWinner(`Player ${winner+1} - ${names[winner]} won the game !`);
+                nextPlayer();
+            }
 
-            case 'bgsuite':
-                const sorted = scoreList.sort();
-                let suite = false;
-                for (let i = 0; i < sorted.length - 1; i++) {
-                    suite = false;
-                    if (sorted[i] + 1 == sorted[i + 1]) suite = true;
-                }
-                if (suite) {
-                    if (currentP === 1 && player === 1 && newGrid[0].bgSuite === null) newGrid[0].bgSuite = 40;
-                    else if (currentP === 2 && player === 2 && newGrid[1].bgSuite === null) newGrid[1].bgSuite = 40;
-                } else {
-                    if (currentP === 1 && player === 1 && newGrid[0].bgSuite === null) newGrid[0].bgSuite = 0;
-                    else if (currentP === 2 && player === 2 && newGrid[1].bgSuite === null) newGrid[1].bgSuite = 0;
-                }
-                break;
 
-            case 'full':
-                const full = scoreList.filter((item, pos) => scoreList.indexOf(item) == pos)
-                if (full.length === 2) {
-                    if (currentP === 1 && player === 1 && newGrid[0].full === null) newGrid[0].full = 25;
-                    else if (currentP === 2 && player === 2 && newGrid[1].full === null) newGrid[1].full = 25;
-                } else {
-                    if (currentP === 1 && player === 1 && newGrid[0].full === null) newGrid[0].full = 0;
-                    else if (currentP === 2 && player === 2 && newGrid[1].full === null) newGrid[1].full = 0;
-                }
-                break;
-
-            case 'square':
-                const count = {};
-                scoreList.forEach(el => {
-                    if (count[el]) {
-                        count[el] += 1;
-                        return
-                    } count[el] = 1;
+            console.log(player, currentP)
+            console.log(newGrid[player].smSuite)
+            // On ne met à jour la grille que si la case cliquée est bien celle du joueur actuel
+            if (currentP === player + 1) {
+                console.log('update')
+                const requete = await fetch('/update-grid', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `player=${player}&grid=${JSON.stringify(newGrid)}`,
                 })
-                if (count[0] === 4 || count[1] === 4 || count[2] === 4 || count[3] === 4 || count[4] === 4 || count[5] === 4) {
-                    if (currentP === 1 && player === 1 && newGrid[0].square === null) newGrid[0].square = total;
-                    else if (currentP === 2 && player === 2 && newGrid[1].square === null) newGrid[1].square = total;
-                } else {
-                    if (currentP === 1 && player === 1 && newGrid[0].square === null) newGrid[0].square = 0;
-                    else if (currentP === 2 && player === 2 && newGrid[1].square === null) newGrid[1].square = 0;
-                }
-                break;
+                const result = await requete.json();
 
-            case 'yams':
-                const same = scoreList.every(el => el === scoreList[0])
-                if (same) {
-                    if (currentP === 1 && player === 1 && newGrid[0].yams === null) newGrid[0].yams = 50;
-                    else if (currentP === 2 && player === 2 && newGrid[1].yams === null) newGrid[1].yams = 50;
-                } else {
-                    if (currentP === 1 && player === 1 && newGrid[0].yams === null) newGrid[0].yams = 0;
-                    else if (currentP === 2 && player === 2 && newGrid[1].yams === null) newGrid[1].yams = 0;
-                }
-                break;
-
-            case 'chance':
-                if (currentP === 1 && player === 1 && newGrid[0].chance === null) newGrid[0].chance = total;
-                else if (currentP === 2 && player === 2 && newGrid[1].chance === null) newGrid[1].chance = total;
-                break;
-        }
-
-
-
-        // --- total 0 --- //
-        if (newGrid[0].as !== null && newGrid[0].two !== null && newGrid[0].three !== null && newGrid[0].four !== null && newGrid[0].five !== null && newGrid[0].six !== null) {
-            newGrid[0].total = newGrid[0].as + newGrid[0].two + newGrid[0].three + newGrid[0].four + newGrid[0].five + newGrid[0].six;
-        }
-        if (newGrid[1].as !== null && newGrid[1].two !== null && newGrid[1].three !== null && newGrid[1].four !== null && newGrid[1].five !== null && newGrid[1].six !== null) {
-            newGrid[1].total = newGrid[1].as + newGrid[1].two + newGrid[1].three + newGrid[1].four + newGrid[1].five + newGrid[1].six;
-        }
-
-        //--- prime --- //
-        if (newGrid[0].total !== null) newGrid[0].total > 63 ? newGrid[0].bonus = 35 : newGrid[0].bonus = 0;
-        if (newGrid[1].total !== null) newGrid[1].total > 63 ? newGrid[1].bonus = 35 : newGrid[1].bonus = 0;
-
-        // --- total 1 --- //
-        if (newGrid[0].bonus !== null) newGrid[0].total1 = newGrid[0].bonus + newGrid[0].total;
-        if (newGrid[1].bonus !== null) newGrid[1].total1 = newGrid[1].bonus + newGrid[1].total;
-
-        // ---total 2 --- //
-        if (newGrid[0].max !== null && newGrid[0].min !== null) newGrid[0].total2 = newGrid[0].max - newGrid[0].min;
-        if (newGrid[1].max !== null && newGrid[1].min !== null) newGrid[1].total2 = newGrid[1].max - newGrid[1].min;
-
-        // --- total 3 --- //
-        if (newGrid[0].brelan !== null && newGrid[0].smSuite !== null && newGrid[0].bgSuite !== null && newGrid[0].full !== null && newGrid[0].square !== null && newGrid[0].yams !== null) {
-            newGrid[0].total3 = newGrid[0].brelan + newGrid[0].smSuite + newGrid[0].bgSuite + newGrid[0].full + newGrid[0].square + newGrid[0].yams;
-        }
-        if (newGrid[1].brelan !== null && newGrid[1].smSuite !== null && newGrid[1].bgSuite !== null && newGrid[1].full !== null && newGrid[1].square !== null && newGrid[1].yams !== null) {
-            newGrid[1].total3 = newGrid[1].brelan + newGrid[1].smSuite + newGrid[1].bgSuite + newGrid[1].full + newGrid[1].square + newGrid[1].yams;
-        }
-
-        //--- total 4 ---//
-        if (newGrid[0].total !== null && newGrid[0].total1 !== null && newGrid[0].total2 !== null && newGrid[0].total3 !== null) {
-            newGrid[0].total4 = newGrid[0].total + newGrid[0].total1 + newGrid[0].total2 + newGrid[0].total3
-        }
-        if (newGrid[1].total !== null && newGrid[1].total1 !== null && newGrid[1].total2 !== null && newGrid[1].total3 !== null) {
-            newGrid[1].total4 = newGrid[1].total + newGrid[1].total1 + newGrid[1].total2 + newGrid[1].total3
-        }
-
-
-        const requete = await fetch('/update-grid', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `player=${player}&grid=${JSON.stringify(newGrid)}`,
-        })
-        const result = await requete.json();
-
-        setGrid([result[0].grid, result[1].grid]);
-
-        if (newGrid[0].total4 && newGrid[1].total4) {
-            newGrid[0].total4 > newGrid[1].total4 ? setWinner('Player 1 Won !') : setWinner('Player 2 Won !');
-            nextPlayer();
-        }
-
-        if (currentP === player) {
-            nextPlayer();
+                newGrid = result.map(el => el.grid)
+                console.log(newGrid)
+                setGrid(newGrid);
+                nextPlayer();
+            }
         }
     }
 
@@ -353,133 +366,113 @@ export default function Game() {
     } else {
         return (
             <div style={styleContainer}>
-                <div>
-                    <div onClick={() => startGame()} style={buttonStyle}>Lancer les dés</div>
-                    <p>Total : {totalExist}</p>
-                    <p>Current player : {currentP}</p>
-                    <p>Nombre de lancé : {compteur}</p>
+                <div style={{display: 'flex'}}>
+                    <div style={{marginRight: '30px'}}>
+                        <div onClick={() => startGame()} style={buttonStyle}>Lancer les dés</div>
+                        <p>Score actuel : {totalExist}</p>
+                        <p>C'est au tour de <strong>{names[currentP - 1]}</strong></p>
+                        <p>Nombre de lancé : {compteur}</p>
+                        <Link to='/'>
+                            <button>Recommencer</button>
+                        </Link>
+                    </div>
                     <table>
                         <tbody>
                             <tr>
                                 <td>JOUEURS</td>
-                                <td>{player1Name}</td>
-                                <td>{player2Name}</td>
+                                {names.map(el => <td>{el[0].toUpperCase()}</td>)}
                             </tr>
                             <tr>
                                 <td>AS</td>
-                                <td onClick={() => writeScore(1, 'as')}>{grid[0].as}</td>
-                                <td onClick={() => writeScore(2, 'as')}>{grid[1].as}</td>
+                                {names.map((el, i) => <td onClick={() => writeScore(i, 'as')}>{grid[i].as}</td>)}
                             </tr>
                             <tr>
                                 <td>TWO</td>
-                                <td onClick={() => writeScore(1, 'two')}>{grid[0].two}</td>
-                                <td onClick={() => writeScore(2, 'two')}>{grid[1].two}</td>
+                                {names.map((el, i) => <td onClick={() => writeScore(i, 'two')}>{grid[i].two}</td>)}
                             </tr>
                             <tr>
                                 <td>THREE</td>
-                                <td onClick={() => writeScore(1, 'three')}>{grid[0].three}</td>
-                                <td onClick={() => writeScore(2, 'three')}>{grid[1].three}</td>
+                                {names.map((el, i) => <td onClick={() => writeScore(i, 'three')}>{grid[i].three}</td>)}
                             </tr>
                             <tr>
                                 <td>FOUR</td>
-                                <td onClick={() => writeScore(1, 'four')}>{grid[0].four}</td>
-                                <td onClick={() => writeScore(2, 'four')}>{grid[1].four}</td>
+                                {names.map((el, i) => <td onClick={() => writeScore(i, 'four')}>{grid[i].four}</td>)}
                             </tr>
                             <tr>
                                 <td>FIVE</td>
-                                <td onClick={() => writeScore(1, 'five')}>{grid[0].five}</td>
-                                <td onClick={() => writeScore(2, 'five')}>{grid[1].five}</td>
+                                {names.map((el, i) => <td onClick={() => writeScore(i, 'five')}>{grid[i].five}</td>)}
                             </tr>
                             <tr>
                                 <td>SIX</td>
-                                <td onClick={() => writeScore(1, 'six')}>{grid[0].six}</td>
-                                <td onClick={() => writeScore(2, 'six')}>{grid[1].six}</td>
+                                {names.map((el, i) => <td onClick={() => writeScore(i, 'six')}>{grid[i].six}</td>)}
                             </tr>
                             <tr>
-                                <td>TOTAL</td>
-                                <td>{grid[0].total}</td>
-                                <td>{grid[1].total}</td>
+                                <td><strong>TOTAL</strong></td>
+                                {names.map((el, i) => <td>{grid[i].total}</td>)}
                             </tr>
                             <tr>
                                 <td>BONUS</td>
-                                <td>{grid[0].bonus}</td>
-                                <td>{grid[1].bonus}</td>
+                                {names.map((el, i) => <td>{grid[i].bonus}</td>)}
                             </tr>
                             <tr>
-                                <td>TOTAL1</td>
-                                <td>{grid[0].total1}</td>
-                                <td>{grid[1].total1}</td>
+                                <td><strong>TOTAL 1</strong></td>
+                                {names.map((el, i) => <td>{grid[i].total1}</td>)}
                             </tr>
                             <tr>
                                 <td>MAX</td>
-                                <td onClick={() => writeScore(1, 'max')}>{grid[0].max}</td>
-                                <td onClick={() => writeScore(2, 'max')}>{grid[1].max}</td>
+                                {names.map((el, i) => <td onClick={() => writeScore(i, 'max')}>{grid[i].max}</td>)}
                             </tr>
                             <tr>
                                 <td>MIN</td>
-                                <td onClick={() => writeScore(1, 'min')}>{grid[0].min}</td>
-                                <td onClick={() => writeScore(2, 'min')}>{grid[1].min}</td>
+                                {names.map((el, i) => <td onClick={() => writeScore(i, 'min')}>{grid[i].min}</td>)}
                             </tr>
                             <tr>
-                                <td>TOTAL2</td>
-                                <td>{grid[0].total2}</td>
-                                <td>{grid[1].total2}</td>
+                                <td><strong>TOTAL 2</strong></td>
+                                {names.map((el, i) => <td>{grid[i].total2}</td>)}
                             </tr>
                             <tr>
                                 <td>BRELAN</td>
-                                <td onClick={() => writeScore(1, 'brelan')}>{grid[0].brelan}</td>
-                                <td onClick={() => writeScore(2, 'brelan')}>{grid[1].brelan}</td>
+                                {names.map((el, i) => <td onClick={() => writeScore(i, 'brelan')}>{grid[i].brelan}</td>)}
                             </tr>
                             <tr>
                                 <td>Pt. SUITE</td>
-                                <td onClick={() => writeScore(1, 'smsuite')}>{grid[0].smSuite}</td>
-                                <td onClick={() => writeScore(2, 'smsuite')}>{grid[1].smSuite}</td>
+                                {names.map((el, i) => <td onClick={() => writeScore(i, 'smsuite')}>{grid[i].smSuite}</td>)}
                             </tr>
                             <tr>
-                                <td>Grd. SUITE</td>
-                                <td onClick={() => writeScore(1, 'bgsuite')}>{grid[0].bgSuite}</td>
-                                <td onClick={() => writeScore(2, 'bgsuite')}>{grid[1].bgSuite}</td>
+                                <td style={{minWidth: '80px'}}>Grd. SUITE</td>
+                                {names.map((el, i) => <td onClick={() => writeScore(i, 'bgsuite')}>{grid[i].bgSuite}</td>)}
                             </tr>
                             <tr>
                                 <td>FULL</td>
-                                <td onClick={() => writeScore(1, 'full')}>{grid[0].full}</td>
-                                <td onClick={() => writeScore(2, 'full')}>{grid[1].full}</td>
+                                {names.map((el, i) => <td onClick={() => writeScore(i, 'full')}>{grid[i].full}</td>)}
                             </tr>
                             <tr>
                                 <td>CARRE</td>
-                                <td onClick={() => writeScore(1, 'square')}>{grid[0].square}</td>
-                                <td onClick={() => writeScore(2, 'square')}>{grid[1].square}</td>
+                                {names.map((el, i) => <td onClick={() => writeScore(i, 'square')}>{grid[i].square}</td>)}
                             </tr>
                             <tr>
                                 <td>YAMS</td>
-                                <td onClick={() => writeScore(1, 'yams')}>{grid[0].yams}</td>
-                                <td onClick={() => writeScore(2, 'yams')}>{grid[1].yams}</td>
+                                {names.map((el, i) => <td onClick={() => writeScore(i, 'yams')}>{grid[i].yams}</td>)}
                             </tr>
                             <tr>
                                 <td>CHANCE</td>
-                                <td onClick={() => writeScore(1, 'chance')}>{grid[0].chance}</td>
-                                <td onClick={() => writeScore(2, 'chance')}>{grid[1].chance}</td>
+                                {names.map((el, i) => <td onClick={() => writeScore(i, 'chance')}>{grid[i].chance}</td>)}
                             </tr>
                             <tr>
-                                <td>TOTAL3</td>
-                                <td>{grid[0].total3}</td>
-                                <td>{grid[1].total3}</td>
+                                <td><strong>TOTAL3</strong></td>
+                                {names.map((el, i) => <td>{grid[i].total3}</td>)}
                             </tr>
                             <tr>
-                                <td>TOTAL4</td>
-                                <td>{grid[0].total4}</td>
-                                <td>{grid[1].total4}</td>
+                                <td><strong>TOTAL4</strong></td>
+                                {names.map((el, i) => <td>{grid[i].total4}</td>)}
                             </tr>
                         </tbody>
                     </table>
-                    <Link to='/'>
-                        <button>Recommencer</button>
-                    </Link>
                 </div>
 
                 <div>{winner}</div>
 
-                <div>{diceList}</div>
+                <div style={{minWidth: '300px'}}>{diceList}</div>
 
             </div>
         );

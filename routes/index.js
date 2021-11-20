@@ -7,11 +7,11 @@ router.post('/create-game', async (req, res) => {
   await playerModel.deleteMany();
   const names = JSON.parse(req.body.names);
 
-  for(let i = 1; i < 3; i++){
+  for(let i = 0; i < names.length; i++){
     
     const player = new playerModel({
       player: i,
-      name: names[i - 1],
+      name: names[i],
       grid: {
         as: null,
         two: null,
@@ -50,9 +50,10 @@ router.get('/get-grid', async (req, res) => {
 
 router.put('/update-grid', async (req, res) => {
   let player = await playerModel.findOne({player: req.body.player});
-  player.grid = JSON.parse(req.body.grid)[req.body.player - 1];  
+  console.log(player)
+  player.grid = JSON.parse(req.body.grid)[req.body.player];  
   await player.save()
-
+console.log(player)
   const players = await playerModel.find();
   res.json(players);
 })

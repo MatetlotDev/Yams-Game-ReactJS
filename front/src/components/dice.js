@@ -21,8 +21,8 @@ const Dice = (props) => {
 
 
     let style = {};
-    if(keep) style = {fontSize: '4rem', margin: '20px', border: '3px solid coral'}
-    else style = {fontSize: '4rem', margin: '20px'}
+    if(keep) style = {fontSize: '4rem', margin: '20px', color: '#6b4141', transform: 'scale(1.05)'}
+    else style = {fontSize: '4rem', margin: '20px', color: '#d45858'}
     
     return (
         <div style={{textAlign: "center"}}>
