@@ -30,12 +30,17 @@ const playerSchema = mongoose.Schema({
     grid: gridSchema,
 })
 
+const gameSchema = mongoose.Schema({
+    name: String,
+    players: [playerSchema],
+})
+
 const userSchema = mongoose.Schema({
     name: String,
     email: String,
     passWord: String,
     token: String,
-    games: [playerSchema],
+    games: [gameSchema],
 })
 
 const userModel = mongoose.model('users', userSchema);

@@ -3,9 +3,12 @@ import 'antd/dist/antd.css';
 import { Card, Input, Button } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { Redirect } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 
 export default function LoginPage () {
+
+    const dispatch = useDispatch();
 
     const [emailLogin, setEmailLogin] = useState('');
     const [emailSignIn, setEmailSignIn] = useState('');
@@ -21,16 +24,32 @@ export default function LoginPage () {
             body: `name=${nameSignIn}&email=${emailSignIn}&password=${passwordSignIn}`,
         })
         const result = await request.json();
-        console.log(result.user)
-        if(result.message) setVerified(true);
+        if(result.message){
+            setVerified(true); 
+            dispatch({type: 'adduser', token: result.user.token});
+        } 
+        setEmailSignIn('')
+        setNameSignIn('')
+        setPasswordSignIn('')
     }
 
-    const login = () => {
-        setVerified(true);
+    const login = async () => {
+        const request = await fetch('/login', {
+            method: 'POST',
+            headers: {'Content-Type':'application/x-www-form-urlencoded'},
+            body: `email=${emailLogin}&password=${passwordLogin}`,
+        })
+        const result = await request.json();
+        if(result.message){
+            setVerified(true);
+            dispatch({type: 'adduser', token: result.user.token})
+        }
+        setEmailLogin('');
+        setPasswordLogin('');
     }
     
     if(verified){
-        return <Redirect to="/NewGame"/>
+        return <Redirect to="/Account"/>
     }
     return(
         <div style={style.container}>

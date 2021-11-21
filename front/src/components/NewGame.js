@@ -3,20 +3,24 @@ import { Redirect } from 'react-router-dom';
 import 'antd/dist/antd.css';
 import { Button, Input, Card, List } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
+import { useSelector, useDispatch } from 'react-redux';
 
 export default function NewGame() {
 
+    const token = useSelector(store => store.token);
+    const dispatch = useDispatch();
+
     const [playerName, setPlayerName] = useState('');
+    const [gameName, setGameName] = useState('');
     const [names, setNames] = useState([]);
     const [createGame, setCreateGame] = useState(false);
 
 
     const buttonClick = async () => {
-        console.log(names)
         const request = await fetch('/create-game', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `names=${JSON.stringify(names)}`,
+            body: `names=${JSON.stringify(names)}&gamename=${gameName}&token=${token}`,
         })
         const result = await request.json();
         if (result.message) setCreateGame(true);
@@ -28,16 +32,20 @@ export default function NewGame() {
     }
  
     if (createGame) {
+        dispatch({type: 'selectgame', game: gameName})
         return <Redirect to="/game" />
     }
     else {
         return (
             <div style={style.main}>
-                <h1>Yams Game</h1>
+                <h1>New Game</h1>
 
-                <Card size="small" title="Add Player" style={{ width: 300 }}>
-                    <Input onChange={(e) => setPlayerName(e.target.value)} value={playerName} placeholder="Player 1" style={style.input} prefix={<UserOutlined />} />
-                    <Button onClick={() => addPlayer()} type="primary" danger ghost>Add</Button>
+                <Card size="small" title="New Game" style={{ width: 300 }}>
+                    <p>Choisis le nom de la partie pour la retrouver plus tard.</p>
+                    <Input onChange={(e) => setGameName(e.target.value)} value={gameName} placeholder="ex : Game 1" style={style.input} prefix={<UserOutlined />} />
+                    <p>Ajoute ici le nom des joueur</p>
+                    <Input onChange={(e) => setPlayerName(e.target.value)} value={playerName} placeholder="John" style={style.input} prefix={<UserOutlined />} />
+                    <Button onClick={() => addPlayer()} type="primary" size="small" danger ghost>Add</Button>
                 </Card>
 
                 <List

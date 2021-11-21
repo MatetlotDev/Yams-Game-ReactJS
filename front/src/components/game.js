@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Dice from './dice';
 import '../App.css';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 import { faDiceOne } from '@fortawesome/free-solid-svg-icons';
 import { faDiceTwo } from '@fortawesome/free-solid-svg-icons';
@@ -35,17 +36,21 @@ let tab = ['-', '-', '-', '-', '-'];
 
 export default function Game() {
 
+    const token = useSelector(store => store.token);
+    const gameName = useSelector(store => store.gamename);
+
     const [grid, setGrid] = useState([]);
     const [scoreList, setScoreList] = useState([]);
     const [compteur, setCompteur] = useState(0);
     const [currentP, setCurrentP] = useState(1);
     const [winner, setWinner] = useState('');
     const [names, setNames] = useState([]);
+    const [redirectAccount, setRedirectAccount] = useState(false)
 
 
     useEffect(() => {
         const loadGrid = async () => {
-            const request = await fetch('/get-grid')
+            const request = await fetch(`/get-grid/${token}/${gameName}`)
             const result = await request.json();
             const grids = result.map(el => el.grid)
             setGrid(grids)
@@ -98,6 +103,15 @@ export default function Game() {
         setScoreList([])
         setCompteur(0);
         currentP === names.length ? setCurrentP(1) : setCurrentP(currentP + 1)
+    }
+
+
+    const deleteGame = async () => {
+        const request = await fetch(`/deletegame/${token}/${gameName}`, {
+            method: 'DELETE',
+        })
+        const result = await request.json();
+        if(result.message) setRedirectAccount(true);
     }
 
 
@@ -340,20 +354,16 @@ export default function Game() {
             }
 
 
-            console.log(player, currentP)
-            console.log(newGrid[player].smSuite)
             // On ne met à jour la grille que si la case cliquée est bien celle du joueur actuel
             if (currentP === player + 1) {
-                console.log('update')
                 const requete = await fetch('/update-grid', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `player=${player}&grid=${JSON.stringify(newGrid)}`,
+                    body: `gamename=${gameName}&player=${player}&grid=${JSON.stringify(newGrid)}&token=${token}`,
                 })
                 const result = await requete.json();
 
                 newGrid = result.map(el => el.grid)
-                console.log(newGrid)
                 setGrid(newGrid);
                 nextPlayer();
             }
@@ -363,7 +373,9 @@ export default function Game() {
 
     if (grid.length === 0) {
         return ''
-    } else {
+    }else if(redirectAccount){
+        return <Redirect to="/Account"/>
+    }else {
         return (
             <div style={styleContainer}>
                 <div style={{display: 'flex'}}>
@@ -372,9 +384,10 @@ export default function Game() {
                         <p>Score actuel : {totalExist}</p>
                         <p>C'est au tour de <strong>{names[currentP - 1]}</strong></p>
                         <p>Nombre de lancé : {compteur}</p>
-                        <Link to='/'>
-                            <button>Recommencer</button>
+                        <Link to='/Account'>
+                            <button>Acceuil</button>
                         </Link>
+                        <button onClick={() => deleteGame()}>Supprimer la partie</button>
                     </div>
                     <table>
                         <tbody>
