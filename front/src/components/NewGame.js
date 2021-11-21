@@ -4,7 +4,7 @@ import 'antd/dist/antd.css';
 import { Button, Input, Card, List } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 
-export default function Homepage() {
+export default function NewGame() {
 
     const [playerName, setPlayerName] = useState('');
     const [names, setNames] = useState([]);

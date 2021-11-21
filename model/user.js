@@ -30,6 +30,14 @@ const playerSchema = mongoose.Schema({
     grid: gridSchema,
 })
 
-const playerModel = mongoose.model('players', playerSchema);
+const userSchema = mongoose.Schema({
+    name: String,
+    email: String,
+    passWord: String,
+    token: String,
+    games: [playerSchema],
+})
 
-module.exports = playerModel;
+const userModel = mongoose.model('users', userSchema);
+
+module.exports = userModel;
