@@ -1,3 +1,10 @@
+/* 
+ * Matthias Lechien
+ *
+ * last Update 26-11-21
+ * 
+ */
+
 import React, { useState } from 'react';
 import 'antd/dist/antd.css';
 import { Card, Input, Button } from 'antd';
@@ -6,6 +13,7 @@ import { Redirect } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 
+// classic login / sign up page
 export default function LoginPage () {
 
     const dispatch = useDispatch();
@@ -58,7 +66,7 @@ export default function LoginPage () {
                 {/* login */}
                 <Card size="small" title="Login" style={{ width: 300, textAlign: 'center' }}>
                     <Input onChange={(e) => setEmailLogin(e.target.value)} value={emailLogin} placeholder="John.doe@gmail.com" style={style.input} prefix={<UserOutlined />} />
-                    <Input onChange={(e) => setPasswordLogin(e.target.value)} value={passwordLogin} placeholder="*******" style={style.input} prefix={<UserOutlined />} />
+                    <Input.Password onChange={(e) => setPasswordLogin(e.target.value)} value={passwordLogin} placeholder="*******" style={style.input} prefix={<UserOutlined />} />
                     <Button onClick={() => login()} size="small" type="primary" danger ghost>Login</Button>
                 </Card>
                 
@@ -66,7 +74,7 @@ export default function LoginPage () {
                 <Card size="small" title="Sign In" style={{ width: 300, textAlign: 'center' }}>
                     <Input onChange={(e) => setNameSignIn(e.target.value)} value={nameSignIn} placeholder="John" style={style.input} prefix={<UserOutlined />} />
                     <Input onChange={(e) => setEmailSignIn(e.target.value)} value={emailSignIn} placeholder="John.doe@gmail.com" style={style.input} prefix={<UserOutlined />} />
-                    <Input onChange={(e) => setPasswordSignIn(e.target.value)} value={passwordSignIn} placeholder="*******" style={style.input} prefix={<UserOutlined />} />
+                    <Input.Password onChange={(e) => setPasswordSignIn(e.target.value)} value={passwordSignIn} placeholder="*******" style={style.input} prefix={<UserOutlined />} />
                     <Button onClick={() => signIn()} size="small" type="primary" danger ghost>Sign In</Button>
                 </Card>
             </div>

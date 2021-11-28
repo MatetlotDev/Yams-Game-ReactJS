@@ -1,4 +1,11 @@
-import React, { useState, useEffect } from 'react';
+/* 
+ * Matthias Lechien
+ *
+ * last Update 26-11-21
+ * 
+ */
+
+import React  from 'react';
 import NewGame from './components/NewGame';
 import LoginPage from './components/LoginPage';
 import Account from './components/Account';

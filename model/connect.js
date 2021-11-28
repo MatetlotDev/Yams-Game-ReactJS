@@ -6,6 +6,7 @@ var options = {
     useUnifiedTopology: true
 }
 
+// DB connection
 mongoose.connect(process.env.DB_CONN,
     options,
     function (err) {

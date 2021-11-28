@@ -1,70 +1,79 @@
+/* 
+ * Matthias Lechien
+ *
+ * last Update 26-11-21
+ * 
+ */
+
+
+// ---classic IMPORTS --- //
 import React, { useState, useEffect } from 'react';
 import Dice from './dice';
 import '../App.css';
 import { Link, Redirect } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-import { faDiceOne } from '@fortawesome/free-solid-svg-icons';
-import { faDiceTwo } from '@fortawesome/free-solid-svg-icons';
-import { faDiceThree } from '@fortawesome/free-solid-svg-icons';
-import { faDiceFour } from '@fortawesome/free-solid-svg-icons';
-import { faDiceFive } from '@fortawesome/free-solid-svg-icons';
-import { faDiceSix } from '@fortawesome/free-solid-svg-icons';
-
-const icons = [faDiceOne, faDiceTwo, faDiceThree, faDiceFour, faDiceFive, faDiceSix]
-
-const styleContainer = {
-    display: 'flex',
-    width: '100%',
-    height: '100vh',
-    alignItems: 'center',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-}
-const buttonStyle = {
-    fontSize: '1rem',
-    padding: '10px',
-    borderRadius: '15px',
-    backgroundColor: 'coral',
-    color: '#fff',
-    cursor: 'pointer',
-}
 
 
-let tab = ['-', '-', '-', '-', '-'];
+// Initialise an array with five '-' wich gonna serve after for the score of the dice
+let tab = ['-', '-', '-', '-', '-']; 
 
 
 export default function Game() {
 
-    const token = useSelector(store => store.token);
-    const gameName = useSelector(store => store.gamename);
+    const token = useSelector(store => store.token); //the token of the user from redux store
+    const gameName = useSelector(store => store.gamename); //the name of the game from redux store
 
-    const [grid, setGrid] = useState([]);
-    const [scoreList, setScoreList] = useState([]);
-    const [compteur, setCompteur] = useState(0);
-    const [currentP, setCurrentP] = useState(1);
-    const [winner, setWinner] = useState('');
-    const [names, setNames] = useState([]);
-    const [redirectAccount, setRedirectAccount] = useState(false)
+    const [grid, setGrid] = useState([]); //an array of object where each object are the grid of the player
+    const [scoreList, setScoreList] = useState([]); //an array of 5 number, wich are the five dices
+    const [compteur, setCompteur] = useState(0); //the number of throws by player (3x each)
+    const [currentP, setCurrentP] = useState(1); //the player's turn
+    const [winner, setWinner] = useState(''); // set the winner at the end
+    const [names, setNames] = useState([]); //an array with the names of the players
+    const [redirectAccount, setRedirectAccount] = useState(false) //redirection state to go back on the Account Screen
 
 
+    // on the load of the component : 
     useEffect(() => {
         const loadGrid = async () => {
-            const request = await fetch(`/get-grid/${token}/${gameName}`)
+            // request the server to get the game we want
+            const request = await fetch(`/get-grid/${token}/${gameName}`)//takes to parameters to find the game
             const result = await request.json();
-            const grids = result.map(el => el.grid)
+
+            // if last player was the n°1 -> set current player to 2
+            // if last player was last one -> set current player to 1
+            result.lastPlayer === result.players.length ? setCurrentP(1) : setCurrentP(result.lastPlayer + 1)
+
+            // sets the grids for each players grid[0] -> grid of player 0 but (currentP = 1) ...I know
+            const grids = result.players.map(el => el.grid)
             setGrid(grids)
-            const name = result.map(el => el.name);
+
+            // sets the array of names names[0] = players0 name
+            const name = result.players.map(el => el.name);
             setNames(name);
         }
         loadGrid();
     }, [])
 
-    // quand on clique sur un dé, on tourne dans un tableau
-    //  on regarde si l'indice correspond au tour de boucle
-    // si oui on regarde si il y a un tiret ou un numéro
-    // si c'est un tiret on remplace par le numéro correspondant
-    // si non on regarde si il est sélectionné ou pas et on l'enlève ou non
+
+    // function called when you throw the dices
+    const startGame = async () => {
+        if (compteur < 3) {//only play if the player have thrown less then 3 times
+            let scores = []; //initialise an empty array
+            for (let i = 0; i < 5; i++) { 
+                // we compare with the array tab, if it's '-' -> we push and random number
+                if (tab[i] === '-') scores.push(Math.floor(Math.random() * 6)) // (6 for 6 face of a dice)
+                else scores.push(tab[i]); // otherwise we leave the number that is already there
+            }
+            setScoreList(scores); //set the scoreList with the new numbers
+            setCompteur(compteur + 1); //increment the count
+        }
+    }
+
+    // when you click on a dice -> takes two parameters : the position in the array and a boolean
+    // we watch trought the array tab and check for the dice we have clicked on
+    // if there's a '-' & we have true we replace it by a random number
+    // if we have false, we replace it by a '-'
     const keepDice = (indice, isSelected) => {
         for (let i = 0; i < 5; i++) {
             if (indice === i) {
@@ -75,37 +84,24 @@ export default function Game() {
         }
     }
 
+    // for each number of scoreList we create a component Dice with a props rand that is the random number
     let diceList = scoreList.map((el, i) => <Dice indice={i} keepDice={keepDice} rand={el} />)
 
-
-    const startGame = async () => {
-        if (compteur < 3) {
-            let scores = [];
-            for (let i = 0; i < 5; i++) {
-                if (tab[i] === '-') scores.push(Math.floor(Math.random() * icons.length))
-                else scores.push(tab[i]);
-            }
-            setScoreList(scores);
-            setCompteur(compteur + 1);
-        }
-    }
+    let totalExist = 0; // when we didn't throw the dice yet, we set the total to 0
+    let total = scoreList.reduce((a, b) => a + b, 5); //make the sum of the scoreList plus 5 (one on a dice = 0, two = 1, ...)
+    if (total > 5) totalExist = total; //if it's greater then 5 we set the total to the real total, 5 beeing the min
 
 
-    let totalExist = '';
-    let total = scoreList.reduce((a, b) => a + b, 5);
-    if (total > 5) totalExist = total;
-
-
-
-    const nextPlayer = () => {
-        console.log('next')
+    // function beeing played each time a player write his score
+    const nextPlayer = () => { //set evrything back to the beginning
         tab = ['-', '-', '-', '-', '-'];
         setScoreList([])
         setCompteur(0);
-        currentP === names.length ? setCurrentP(1) : setCurrentP(currentP + 1)
+        currentP === names.length ? setCurrentP(1) : setCurrentP(currentP + 1) //increment the player unless it's the last one
     }
 
 
+    // when you click on the button delete game, delete the game from the DB and redirect to account screen
     const deleteGame = async () => {
         const request = await fetch(`/deletegame/${token}/${gameName}`, {
             method: 'DELETE',
@@ -115,13 +111,14 @@ export default function Game() {
     }
 
 
-
+    // --- Main function to write score in the players grid --- //
     const writeScore = async (player, row) => {
-        if (scoreList.length !== 0) {
+        if (scoreList.length !== 0) { // only write the score if we have thrown the dice
 
-            let newGrid = [...grid];
+            let newGrid = [...grid]; //make a copy of the actual players grid
 
-            //--- condition pour chaque case --- //
+            //--- condition for each scenario  --- //
+            // I'll let you enjoy the understanding of each ;)
 
             switch (row) {
 
@@ -185,6 +182,7 @@ export default function Game() {
                     })
                     break;
 
+                // not sure about this one, there could be a better way
                 case 'brelan':
                     const countB = {};
                     let brelan = false;
@@ -207,6 +205,7 @@ export default function Game() {
                     }
                     break;
 
+                // same for this one, it doesn't work all the time
                 case 'smsuite':
                     const sortedsm = scoreList.sort().filter((item, pos) => scoreList.indexOf(item) == pos);
                     let suitesm = 0;
@@ -301,6 +300,7 @@ export default function Game() {
             }
 
 
+            //  --- Sum of all the totals ---  //
 
             // --- total 0 --- //
             names.forEach((el, i) => {
@@ -309,7 +309,7 @@ export default function Game() {
                 }
             })
 
-            //--- prime --- //
+            //--- bonus --- //  (if the score of total zero is greater than 63, there's a bonus)
             names.forEach((el, i) => {
                 if (newGrid[i].total !== null) newGrid[i].total > 63 ? newGrid[i].bonus = 35 : newGrid[i].bonus = 0;
             })
@@ -339,60 +339,64 @@ export default function Game() {
             })
 
 
-            if (newGrid[names.length - 1].total4) {
+            // if the the first one have a score in total4 that means all the others have finished, because he is the last one to start
+            if (newGrid[0].total4) {
                 const endingScores = newGrid.map(el => el.total4);
                 let winner = 0;
                 let max = endingScores[0];
-                for (let i = 1; i < endingScores.length; ++i) {
+                for (let i = 1; i < endingScores.length; ++i) { // we check wich score is the bigger
                     if (endingScores[i] > max) {
                         max = endingScores[i];
-                        winner = i;
+                        winner = i; // and remember the position like so
                     }
                 }
                 setWinner(`Player ${winner+1} - ${names[winner]} won the game !`);
-                nextPlayer();
+                nextPlayer(); // we play next player to remove the dice from the screen
             }
 
 
-            // On ne met à jour la grille que si la case cliquée est bien celle du joueur actuel
+            // we only update the grid if the column clicked on is the same then the current player 
             if (currentP === player + 1) {
-                const requete = await fetch('/update-grid', {
+                const requete = await fetch('/update-grid', { // request the backend to update the grid 
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `gamename=${gameName}&player=${player}&grid=${JSON.stringify(newGrid)}&token=${token}`,
-                })
+                })// to find the grid we need the gamename, the actual player, and the user token
                 const result = await requete.json();
 
+                //we get back the game updated and set our actual grid with only the grids of the players
                 newGrid = result.map(el => el.grid)
                 setGrid(newGrid);
-                nextPlayer();
+                nextPlayer(); // and it's next player's turn
             }
         }
     }
 
 
+    // I povided this, because, it's not fast enought at the loading of the game screen
+    // so it doesn't show error like grid[0].total4 is undefined
     if (grid.length === 0) {
         return ''
-    }else if(redirectAccount){
+    }else if(redirectAccount){ // when you click on account or delete game
         return <Redirect to="/Account"/>
     }else {
-        return (
+        return ( // a really basic grid made with a table 
             <div style={styleContainer}>
                 <div style={{display: 'flex'}}>
                     <div style={{marginRight: '30px'}}>
-                        <div onClick={() => startGame()} style={buttonStyle}>Lancer les dés</div>
-                        <p>Score actuel : {totalExist}</p>
-                        <p>C'est au tour de <strong>{names[currentP - 1]}</strong></p>
-                        <p>Nombre de lancé : {compteur}</p>
+                        <div onClick={() => startGame()} style={buttonStyle}>Throw Dice</div>
+                        <p>Actual score : {total}</p>
+                        <p>It's <strong>{names[currentP - 1] + "'s"}</strong> turn</p>
+                        <p>Count of throw : {compteur}</p>
                         <Link to='/Account'>
-                            <button>Acceuil</button>
+                            <button>Account</button>
                         </Link>
-                        <button onClick={() => deleteGame()}>Supprimer la partie</button>
+                        <button onClick={() => deleteGame()}>Delete game</button>
                     </div>
                     <table>
                         <tbody>
                             <tr>
-                                <td>JOUEURS</td>
+                                <td>Players</td>
                                 {names.map(el => <td>{el[0].toUpperCase()}</td>)}
                             </tr>
                             <tr>
@@ -490,6 +494,23 @@ export default function Game() {
             </div>
         );
     }
+}
+
+const styleContainer = {
+    display: 'flex',
+    width: '100%',
+    height: '100vh',
+    alignItems: 'center',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+}
+const buttonStyle = {
+    fontSize: '1rem',
+    padding: '10px',
+    borderRadius: '15px',
+    backgroundColor: 'coral',
+    color: '#fff',
+    cursor: 'pointer',
 }
 
 

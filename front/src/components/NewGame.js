@@ -1,3 +1,10 @@
+/* 
+ * Matthias Lechien
+ *
+ * last Update 26-11-21
+ * 
+ */
+
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import 'antd/dist/antd.css';
@@ -16,7 +23,8 @@ export default function NewGame() {
     const [createGame, setCreateGame] = useState(false);
 
 
-    const buttonClick = async () => {
+    // send a request to the backend to create a game with the players name
+    const startGame = async () => {
         const request = await fetch('/create-game', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -26,6 +34,7 @@ export default function NewGame() {
         if (result.message) setCreateGame(true);
     }
 
+    // add the player's name to an array with all the names
     const addPlayer = () => {
         setNames([...names, playerName]);
         setPlayerName('');
@@ -41,9 +50,9 @@ export default function NewGame() {
                 <h1>New Game</h1>
 
                 <Card size="small" title="New Game" style={{ width: 300 }}>
-                    <p>Choisis le nom de la partie pour la retrouver plus tard.</p>
+                    <p>Choose the name of the game to find it later.</p>
                     <Input onChange={(e) => setGameName(e.target.value)} value={gameName} placeholder="ex : Game 1" style={style.input} prefix={<UserOutlined />} />
-                    <p>Ajoute ici le nom des joueur</p>
+                    <p>Add player's name</p>
                     <Input onChange={(e) => setPlayerName(e.target.value)} value={playerName} placeholder="John" style={style.input} prefix={<UserOutlined />} />
                     <Button onClick={() => addPlayer()} type="primary" size="small" danger ghost>Add</Button>
                 </Card>
@@ -57,7 +66,7 @@ export default function NewGame() {
                     renderItem={(item, i) => <List.Item>Player {i + 1} - {item}</List.Item>}
                 />
 
-                <Button onClick={() => buttonClick()} type="danger" size={'large'}>
+                <Button onClick={() => startGame()} type="danger" size={'large'}>
                     Start Game
                 </Button>
             </div>

@@ -32,6 +32,7 @@ const playerSchema = mongoose.Schema({
 
 const gameSchema = mongoose.Schema({
     name: String,
+    lastPlayer: Number,
     players: [playerSchema],
 })
 
@@ -43,6 +44,7 @@ const userSchema = mongoose.Schema({
     games: [gameSchema],
 })
 
+// each users have an aray of games wich all have an array of players, wich all have a grid
 const userModel = mongoose.model('users', userSchema);
 
 module.exports = userModel;
